@@ -1,37 +1,40 @@
 <?php
+
 /**
  * Class for adding a new tab to the application details screen.
  *
  * @package WPCD
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
 /**
  * Class for adding a new tab to the application details screen.
  */
-class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
+class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
+{
 
 	/**
 	 * WPCD_WORDPRESS_TABS_PHP constructor.
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 
 		parent::__construct();
 
-		add_filter( "wpcd_app_{$this->get_app_name()}_get_tabnames", array( $this, 'get_tab' ), 10, 1 );
-		add_filter( "wpcd_app_{$this->get_app_name()}_get_tabs", array( $this, 'get_tab_fields_sample' ), 10, 2 );
-		add_filter( "wpcd_app_{$this->get_app_name()}_tab_action", array( $this, 'tab_action_sample' ), 10, 3 );
+		add_filter("wpcd_app_{$this->get_app_name()}_get_tabnames", array($this, 'get_tab'), 10, 1);
+		add_filter("wpcd_app_{$this->get_app_name()}_get_tabs", array($this, 'get_tab_fields_sample'), 10, 2);
+		add_filter("wpcd_app_{$this->get_app_name()}_tab_action", array($this, 'tab_action_sample'), 10, 3);
 
-		add_action( "wpcd_command_{$this->get_app_name()}_completed", array( $this, 'command_completed_sample' ), 10, 2 );
+		add_action("wpcd_command_{$this->get_app_name()}_completed", array($this, 'command_completed_sample'), 10, 2);
 
 		// Filter to make sure we give the correct file path when merging contents.
-		add_filter( 'wpcd_script_file_name', array( $this, 'wpcd_script_file_name' ), 10, 2 );
+		add_filter('wpcd_script_file_name', array($this, 'wpcd_script_file_name'), 10, 2);
 
 		// Filter to handle script file tokens.
-		add_filter( 'wpcd_wpapp_replace_script_tokens', array( $this, 'wpcd_wpapp_replace_script_tokens' ), 10, 7 );
+		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 7);
 	}
 
 	/**
@@ -46,13 +49,13 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 * @param int    $id     The postID of the server cpt.
 	 * @param string $name   The name of the command.
 	 */
-	public function command_completed_sample( $id, $name ) {
+	public function command_completed_sample($id, $name)
+	{
 
 		// remove the 'temporary' meta so that another attempt will run if necessary.
-		delete_post_meta( $id, "wpcd_app_{$this->get_app_name()}_action_status" );
-		delete_post_meta( $id, "wpcd_app_{$this->get_app_name()}_action" );
-		delete_post_meta( $id, "wpcd_app_{$this->get_app_name()}_action_args" );
-
+		delete_post_meta($id, "wpcd_app_{$this->get_app_name()}_action_status");
+		delete_post_meta($id, "wpcd_app_{$this->get_app_name()}_action");
+		delete_post_meta($id, "wpcd_app_{$this->get_app_name()}_action_args");
 	}
 
 
@@ -63,9 +66,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return array    $tabs The default value.
 	 */
-	public function get_tab( $tabs ) {
+	public function get_tab($tabs)
+	{
 		$tabs['sample'] = array(
-			'label' => __( 'Sample Add-on', 'wpcd' ),
+			'label' => __('Sample Add-on', 'wpcd'),
 		);
 		return $tabs;
 	}
@@ -81,10 +85,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return array Array of actions, complying with the structure necessary by metabox.io fields.
 	 */
-	public function get_tab_fields_sample( array $fields, $id ) {
+	public function get_tab_fields_sample(array $fields, $id)
+	{
 
-		return $this->get_fields_for_tab( $fields, $id, 'sample' );
-
+		return $this->get_fields_for_tab($fields, $id, 'sample');
 	}
 
 	/**
@@ -96,22 +100,25 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return mixed    $result The default value of the result.
 	 */
-	public function tab_action_sample( $result, $action, $id ) {
+	public function tab_action_sample($result, $action, $id)
+	{
 
-		switch ( $action ) {
+		switch ($action) {
 			case 'sample-action-a':
-				$result = $this->sample_action_a( $id, $action );
+				$result = $this->sample_action_a($id, $action);
 				break;
 			case 'sample-action-b':
-				$result = $this->sample_action_b( $id, $action );
+
 				break;
 			case 'sample-action-c':
-				$result = $this->sample_action_c( $id, $action );
+				$result = $this->sample_action_c($id, $action);
+				break;
+			case 'sample-action-d':
+				$result = $this->sample_action_d($id, $action);
 				break;
 		}
 
 		return $result;
-
 	}
 
 	/**
@@ -120,10 +127,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 * @param int $id The post ID of the server.
 	 * @return array Array of actions with key as the action slug and value complying with the structure necessary by metabox.io fields.
 	 */
-	public function get_actions( $id ) {
+	public function get_actions($id)
+	{
 
-		return $this->get_server_fields_sample( $id );
-
+		return $this->get_server_fields_sample($id);
 	}
 
 	/**
@@ -133,17 +140,18 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return array Array of actions with key as the action slug and value complying with the structure necessary by metabox.io fields.
 	 */
-	private function get_server_fields_sample( $id ) {
+	private function get_server_fields_sample($id)
+	{
 
 		// Set up metabox items.
 		$actions = array();
 
 		// Heading.
-		$sample_desc  = __( 'Sample heading with some instructions and notes if you want.', 'wpcd' );
+		$sample_desc  = __('Sample heading with some instructions and notes if you want.', 'wpcd');
 		$sample_desc .= '<br />';
 
 		$actions['sample-add-on-heading'] = array(
-			'label'          => __( 'Sample Heading', 'wpcd' ),
+			'label'          => __('Sample Heading', 'wpcd'),
 			'type'           => 'heading',
 			'raw_attributes' => array(
 				'desc' => $sample_desc,
@@ -151,61 +159,109 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 		);
 
 		$actions['sample-action-field-01'] = array(
-			'label'          => __( 'Sample Text Data', 'wpcd' ),
+			'label'          => __('Sample Text Data', 'wpcd'),
 			'type'           => 'text',
 			'raw_attributes' => array(
-				'desc'           => __( 'Enter some data here. It\'s actually not used in this example but is shown here so you can see how it\'s passed via the AJAX request ', 'wpcd' ),
+				'desc'           => __('Enter some data here. It\'s actually not used in this example but is shown here so you can see how it\'s passed via the AJAX request ', 'wpcd'),
 				// the key of the field (the key goes in the request).
 				'data-wpcd-name' => 'sample_data_01',
 			),
 		);
 
 		$actions['sample-action-a'] = array(
-			'label'          => __( 'Update Plugins', 'wpcd' ),
+			'label'          => __('Update Plugins', 'wpcd'),
 			'raw_attributes' => array(
-				'std'                 => __( 'Update All Plugins', 'wpcd' ),
-				'desc'                => __( 'Update all plugins on the site', 'wpcd' ),
+				'std'                 => __('Update All Plugins', 'wpcd'),
+				'desc'                => __('Update all plugins on the site', 'wpcd'),
 				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode( array( '#wpcd_app_action_sample-action-field-01' ) ),
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
 				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __( 'Are you sure you would like to update all plugins?', 'wpcd' ),
+				'confirmation_prompt' => __('Are you sure you would like to update all plugins?', 'wpcd'),
 			),
 			'type'           => 'button',
 		);
 
 		$actions['sample-action-b'] = array(
-			'label'          => __( 'Update Themes', 'wpcd' ),
+			'label'          => __('Update Themes', 'wpcd'),
 			'raw_attributes' => array(
-				'std'                 => __( 'Update All Themes', 'wpcd' ),
-				'desc'                => __( 'Update all themes on the site', 'wpcd' ),
+				'std'                 => __('Update All Themes', 'wpcd'),
+				'desc'                => __('Update all themes on the site', 'wpcd'),
 				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode( array( '#wpcd_app_action_sample-action-field-01' ) ),
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
 				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __( 'Are you sure you would like to update all themes?', 'wpcd' ),
+				'confirmation_prompt' => __('Are you sure you would like to update all themes?', 'wpcd'),
 			),
 			'type'           => 'button',
 		);
 
 		$actions['sample-action-c'] = array(
-			'label'          => __( 'Export Database', 'wpcd' ),
+			'label'          => __('Export Database', 'wpcd'),
 			'raw_attributes' => array(
-				'std'                 => __( 'Export database', 'wpcd' ),
-				'desc'                => __( 'Export database to a local file on the server', 'wpcd' ),
+				'std'                 => __('Export database', 'wpcd'),
+				'desc'                => __('Export database to a local file on the server', 'wpcd'),
 				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode( array( '#wpcd_app_action_sample-action-field-01' ) ),
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
 				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __( 'Are you sure you would like to export the database?', 'wpcd' ),
+				'confirmation_prompt' => __('Are you sure you would like to export the database?', 'wpcd'),
 				// Show the console.
 				'log_console'         => true,
 				// Initial console message.
-				'console_message'     => __( 'Preparing to start export...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd' ),
+				'console_message'     => __('Preparing to start export...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
 			),
 			'type'           => 'button',
 		);
+		// ssl 
+		$actions['sample-action-d'] = array(
+			'label'          => __('Install Commercial SSL', 'wpcd'),
+			'raw_attributes' => array(
+				'std'                 => __('Install Commercial SSL', 'wpcd'),
+				'desc'                => __('Install a commercial SSL certificate on the site. This is for sites not using Let\'s Encrypt.', 'wpcd'),
+				// fields that contribute data for this action.
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
+				// make sure we give the user a confirmation prompt.
+				'confirmation_prompt' => __('Are you sure you would like to install a commercial SSL certificate?', 'wpcd'),
+			),
+			'type'           => 'button',
+		);
+		$actions = array();
 
+		$certificate_desc  = __('certificate witth some instructions', 'your domain');
+		$certificate_desc .= '<br />';
+
+		$actions['ssl-certificate-heading'] = array(
+			'label'          => __('SSL Certificate instructions', 'your domain'),
+			'typ'            => 'heading',
+			'raw_attributes' => array(
+				'desc'  => $certificate_desc,
+			),
+			'type'            => 'button',
+		);
+
+
+		$actions['ssl-certificate-field'] = array(
+			'label'                 => __('SSL Certificate File', 'your domain'),
+			'type'                  => 'text',
+			'raw_attributes'        => array(
+				'desc'              => __('Enter your SSL certificate content', 'your domain'),
+				'data-wpcd-name'    => 'ssl_certificate_content',
+
+			),
+			'type'         => 'button',
+		);
+
+		$actions['private-key-field'] = array(
+			'label'                 => __('Private Key File', 'your domain'),
+			'type'                  => 'text',
+			'raw_attributes'        => array(
+				'desc'              => __('Enter your private key content', 'your domain'),
+				'data-wpcd-name'    => 'private_key_content',
+
+			),
+			'type'         => 'button',
+		);
 		return $actions;
-
 	}
+
 
 	/**
 	 * Sample Action "A": updates all plugins on the site.
@@ -215,18 +271,19 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return boolean success/failure/other
 	 */
-	private function sample_action_a( $id, $action ) {
+	private function sample_action_a($id, $action)
+	{
 
 		// Get the instance details.
-		$instance = $this->get_app_instance_details( $id );
+		$instance = $this->get_app_instance_details($id);
 
-		if ( is_wp_error( $instance ) ) {
+		if (is_wp_error($instance)) {
 			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error( sprintf( __( 'Unable to execute this request because we cannot get the instance details for action %s', 'wpcd' ), $action ) );
+			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
 		}
 
 		// Get the domain we're working on.
-		$domain = $this->get_domain_name( $id );
+		$domain = $this->get_domain_name($id);
 
 		// Construct a simple command.
 		// This command is three bash commands chanined by "&&".
@@ -238,23 +295,22 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 
 		// Send the command and wait for a reply.
 		// This command needs to complete within the limits of the PHP Execution timeout.
-		$result = $this->execute_ssh( 'generic', $instance, array( 'commands' => $command ) );
+		$result = $this->execute_ssh('generic', $instance, array('commands' => $command));
 
 		// Check output string to make sure we don't have an error...
-		if ( ! ( strpos( $result, 'Success: Updated' ) ) && ! ( strpos( $result, 'Success: Plugin already updated.' ) ) ) {
-			return new \WP_Error( __( 'An error was encounered during the updates. Please check the SSH logs for more information.', 'wpcd' ) );
+		if (!(strpos($result, 'Success: Updated')) && !(strpos($result, 'Success: Plugin already updated.'))) {
+			return new \WP_Error(__('An error was encounered during the updates. Please check the SSH logs for more information.', 'wpcd'));
 		}
 
 		// If you got here, success!
 		// @todo: you can do cool things by parsing the result string to check for number of plugins updated and reporting that back to the user.
-		$success_msg = __( 'Command was a success - plugins updated!', 'wpcd' );
+		$success_msg = __('Command was a success - plugins updated!', 'wpcd');
 		$result      = array(
 			'msg'     => $success_msg,
 			'refresh' => 'yes',
 		);
 
 		return $result;
-
 	}
 
 	/**
@@ -267,18 +323,19 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return boolean success/failure/other
 	 */
-	private function sample_action_b( $id, $action ) {
+	private function sample_action_b($id, $action)
+	{
 
 		// Get the instance details.
-		$instance = $this->get_app_instance_details( $id );
+		$instance = $this->get_app_instance_details($id);
 
-		if ( is_wp_error( $instance ) ) {
+		if (is_wp_error($instance)) {
 			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error( sprintf( __( 'Unable to execute this request because we cannot get the instance details for action %s', 'wpcd' ), $action ) );
+			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
 		}
 
 		// Get the domain we're working on.
-		$domain = $this->get_domain_name( $id );
+		$domain = $this->get_domain_name($id);
 
 		// Construct a simple command.
 		// This command is three bash commands chanined by "&&".
@@ -290,23 +347,22 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 
 		// Send the command and wait for a reply.
 		// This command needs to complete within the limits of the PHP Execution timeout.
-		$result = $this->execute_ssh( 'generic', $instance, array( 'commands' => $command ) );
+		$result = $this->execute_ssh('generic', $instance, array('commands' => $command));
 
 		// Check output string to make sure we don't have an error...
-		if ( ! ( strpos( $result, 'Success: Updated' ) ) && ! ( strpos( $result, 'Success: Theme already updated.' ) ) ) {
-			return new \WP_Error( __( 'An error was encounered during the updates. Please check the SSH logs for more information.', 'wpcd' ) );
+		if (!(strpos($result, 'Success: Updated')) && !(strpos($result, 'Success: Theme already updated.'))) {
+			return new \WP_Error(__('An error was encounered during the updates. Please check the SSH logs for more information.', 'wpcd'));
 		}
 
 		// If you got here, success!
 		// @todo: you can do cool things by parsing the result string to check for number of plugins updated and reporting that back to the user.
-		$success_msg = __( 'Command was a success - themes updated!', 'wpcd' );
+		$success_msg = __('Command was a success - themes updated!', 'wpcd');
 		$result      = array(
 			'msg'     => $success_msg,
 			'refresh' => 'yes',
 		);
 
 		return $result;
-
 	}
 
 	/**
@@ -322,23 +378,24 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return boolean success/failure/other
 	 */
-	private function sample_action_c( $id, $action ) {
+	private function sample_action_c($id, $action)
+	{
 
 		// Get the instance details.
-		$instance = $this->get_app_instance_details( $id );
+		$instance = $this->get_app_instance_details($id);
 
-		if ( is_wp_error( $instance ) ) {
+		if (is_wp_error($instance)) {
 			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error( sprintf( __( 'Unable to execute this request because we cannot get the instance details for action %s', 'wpcd' ), $action ) );
+			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
 		}
 
 		// We're going to collect any arguments sent.
 		// But we're not using them. Only including them here so that you can see how we do basic sanitization.
 		// You can also use the FILTER_INPUT function if you like as well.
-		$args = wp_parse_args( sanitize_text_field( wp_unslash( $_POST['params'] ) ) );
+		$args = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
 
 		// Get the domain we're working on.
-		$domain = $this->get_domain_name( $id );
+		$domain = $this->get_domain_name($id);
 
 		// we want to make sure this command runs only once in a "swatch beat" for a domain.
 		// e.g. 2 manual backups cannot run for the same domain at the same time (time = swatch beat)
@@ -346,7 +403,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 		// we are appending the Swatch beat to the command name because this command can be run multiple times
 		// over the app's lifetime.
 		// but within a swatch beat, it can only be run once.
-		$command             = sprintf( '%s---%s---%d', $action, $domain, gmdate( 'B' ) );
+		$command             = sprintf('%s---%s---%d', $action, $domain, gmdate('B'));
 		$instance['command'] = $command;
 		$instance['app_id']  = $id;
 
@@ -371,11 +428,73 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 		 * Check out the write up about the different aysnc methods we use
 		 * here: https://wpclouddeploy.com/documentation/wpcloud-deploy-dev-notes/ssh-execution-models/
 		 */
-		$return = $this->run_async_command_type_2( $id, $command, $run_cmd, $instance, $action );
+		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
 
 		return $return;
-
 	}
+
+	/**
+	 * Install Commercial and Key SSL Certificate.
+	 *
+	 * @param int    $id                 The postID of the server cpt.
+	 * @param string $action             The action to be performed (this matches the string required in the bash scripts if bash scripts are used).
+	 *
+	 * @return boolean success/failure/other
+	 */
+	private function sample_action_d($id, $action)
+	{
+		// Get the instance details.
+		$instance = $this->get_app_instance_details($id);
+
+		if (is_wp_error($instance)) {
+			/* translators: %s is replaced with the name of the action being executed */
+			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
+		}
+
+		// Get the domain we're working on.
+		$domain = $this->get_domain_name($id);
+
+		// Construct a command to update SSL certificates.
+		// This command changes the folder to the WordPress folder (which is the same name as the domain)
+		// and then runs the wp-cli command to update SSL certificates.
+
+		// Replace these paths with actual paths to your commercial SSL certificate and key files.
+		$sslCertificatePath = '/path/to/commercial_certificate.crt';
+		$sslKeyPath = '/path/to/commercial_private_key.key';
+
+		// Call your function to install the commercial SSL certificate
+		$result = $this->execute_ssh('generic', $instance, ['commands' => $command]);
+
+		if ($result) {
+			$success_msg = __('Command was a success - commercial and key SSL installed!', 'wpcd');
+			$result = [
+				'msg' => $success_msg,
+				'refresh' => 'yes',
+			];
+		} else {
+			$result = new \WP_Error(__('Failed to install commercial and key SSL certificate.', 'wpcd'));
+		}
+
+		// Constructing the async command
+		$run_cmd = $this->turn_script_into_command(
+			$instance,
+			'ssl-file.txt',
+			array_merge(
+				$args,
+				[
+					'command' => $command,
+					'action' => $action,
+					'domain' => $domain,
+				]
+			)
+		);
+
+		// Running the async command
+		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
+
+		return $result;
+	}
+
 
 
 	/**
@@ -391,15 +510,15 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *
 	 * @return boolean success/failure/other
 	 */
-	public function wpcd_script_file_name( $script_name ) {
+	public function wpcd_script_file_name($script_name)
+	{
 
 		// shortcut and return if not something we should handle.
-		if ( 'exportdb.txt' !== $script_name ) {
+		if ('exportdb.txt' !== $script_name && 'ssl-file.txt' !== $script_name) {
 			return $script_name;
 		}
 
 		return WPCDSAMPLE_PATH . 'includes/scripts/' . $script_name;
-
 	}
 
 	/**
@@ -422,24 +541,32 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS {
 	 *    public_key: The path to the public key
 	 *    password: The password of the user.
 	 */
-	public function wpcd_wpapp_replace_script_tokens( $new_array, $array, $script_name, $script_version, $instance, $command, $additional ) {
+	public function wpcd_wpapp_replace_script_tokens($new_array, $array, $script_name, $script_version, $instance, $command, $additional)
+	{
 
-		if ( 'exportdb.txt' === $script_name ) {
+		if ('exportdb.txt' === $script_name) {
 			$command_name = $additional['command'];
 			$new_array    = array_merge(
 				array(
 					'SCRIPT_LOGS'  => "{$this->get_app_name()}_{$command_name}",
-					'CALLBACK_URL' => $this->get_command_url( $instance['app_id'], $command_name, 'completed' ),
+					'CALLBACK_URL' => $this->get_command_url($instance['app_id'], $command_name, 'completed'),
+				),
+				$additional
+			);
+		}
+		if ('ssl-file.txt' === $script_name) {
+			$command_name = $additional['command'];
+			$new_array    = array_merge(
+				array(
+					'SCRIPT_LOGS'  => "{$this->get_app_name()}_{$command_name}",
+					'CALLBACK_URL' => $this->get_command_url($instance['app_id'], $command_name, 'completed'),
 				),
 				$additional
 			);
 		}
 
 		return $new_array;
-
 	}
-
-
 }
 
 new WPCD_WordPress_TABS_APP_SAMPLE();
