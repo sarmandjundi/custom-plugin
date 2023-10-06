@@ -225,7 +225,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		);
 		$actions = array();
 
-		$certificate_desc  = __('certificate witth some instructions', 'your domain');
+		$certificate_desc  = __('certificate with some instructions', 'your domain');
 		$certificate_desc .= '<br />';
 
 		$actions['ssl-certificate-heading'] = array(
