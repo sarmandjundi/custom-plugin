@@ -9,6 +9,17 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+function get_html()
+{
+?>
+
+	<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="action" value="handle_file_upload">
+		<input type="file" name="file" id="file">
+		<input type="submit" value="Upload File">
+	</form>
+<?php
+}
 
 
 
@@ -19,6 +30,33 @@ if (!defined('ABSPATH')) {
  */
 class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 {
+
+	public function handle_file_upload()
+	{
+		if (isset($_FILES['file'])) {
+			$file = $_FILES['file'];
+
+			// Define the upload directory
+			$upload_dir = wp_upload_dir();
+
+			// Generate a unique file name
+			$file_name = sanitize_file_name($file['name']);
+
+			// Move the uploaded file to the server
+			$move_result = move_uploaded_file($file['tmp_name'], $upload_dir['path'] . '/' . $file_name);
+
+			if ($move_result) {
+				echo 'File uploaded successfully to ' . $upload_dir['url'] . '/' . $file_name;
+			} else {
+				echo 'Error uploading file.';
+			}
+			// Redirect back to the page after processing
+			wp_redirect(wp_get_referer());
+			exit;
+		}
+	}
+
+
 
 	/**
 	 * WPCD_WORDPRESS_TABS_PHP constructor.
@@ -32,14 +70,21 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		add_filter("wpcd_app_{$this->get_app_name()}_get_tabs", array($this, 'get_tab_fields_sample'), 10, 2);
 		add_filter("wpcd_app_{$this->get_app_name()}_tab_action", array($this, 'tab_action_sample'), 10, 3);
 
-		add_action("wpcd_command_{$this->get_app_name()}_completed", array($this, 'command_completed_sample'), 10, 2);
+		add_action("wpcd_command_{$this->get_app_name()}_completed", array($this, 'command_completed_sample'), 10, 4);
+
+		add_action('admin_post_handle_file_upload', array($this, 'handle_file_upload'), 10, 5);
+		add_action('admin_post_nopriv_handle_file_upload', array($this, 'handle_file_upload'), 10, 6);
 
 		// Filter to make sure we give the correct file path when merging contents.
-		add_filter('wpcd_script_file_name', array($this, 'wpcd_script_file_name'), 10, 2);
+		add_filter('wpcd_script_file_name', array($this, 'wpcd_script_file_name'), 10, 7);
 
 		// Filter to handle script file tokens.
-		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 7);
+		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 8);
+		get_html();
 	}
+
+
+
 
 	/**
 	 * Called when a command completes.
@@ -140,6 +185,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		return $this->get_server_fields_sample($id);
 	}
 
+
+
 	/**
 	 * Gets the fields for the services to be shown in the Sample tab in the server details screen.
 	 *
@@ -147,8 +194,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	 *
 	 * @return array Array of actions with key as the action slug and value complying with the structure necessary by metabox.io fields.
 	 */
+
 	private function get_server_fields_sample($id)
 	{
+
 
 		// Set up metabox items.
 		$actions = array();
@@ -264,8 +313,14 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			),
 			'type'         => 'button',
 		);
+
+
 		return $actions;
 	}
+
+
+
+
 
 
 	/**
