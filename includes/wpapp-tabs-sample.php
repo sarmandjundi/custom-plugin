@@ -25,14 +25,13 @@ function get_html()
 
 
 
-/**
- * Class for adding a new tab to the application details screen.
- */
+
 class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 {
 
 	public function handle_file_upload()
 	{
+
 		if (isset($_FILES['file'])) {
 			$file = $_FILES['file'];
 
@@ -167,6 +166,9 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 				break;
 			case 'ssl-certificate-field':
 				$result = $this->ssl_certificate_field($id, $action);
+				break;
+			case 'choose-file':
+				$result = $this->choose_file($id, $action);
 				break;
 		}
 
@@ -312,6 +314,37 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 			),
 			'type'         => 'button',
+
+		);
+		$actions['choose-file'] = array(
+			'label'                 => __('choose File', 'your domain'),
+			//'type'                  => 'text',
+			'raw_attributes'        => array(
+				'desc'              => __('choose your file', 'your domain'),
+				'data-wpcd-name'    => 'choose_file',
+
+			),
+			'type'         => 'file',
+			'name'       => 'file',
+			'id'          => 'file',
+
+
+
+
+
+		);
+		$actions['handle-file-upload'] = array(
+			'label'                 => __('choose File', 'your domain'),
+			//'type'                  => 'text',
+			'raw_attributes'        => array(
+				'desc'              => __('choose your file', 'your domain'),
+				'data-wpcd-name'    => 'handle_file_upload',
+
+			),
+			'type'         => 'submit',
+			'value'       => 'Upload file',
+
+
 		);
 
 
@@ -481,6 +514,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			)
 		);
 
+
 		/**
 		 * Run the constructed commmand .
 		 * Check out the write up about the different aysnc methods we use
@@ -490,6 +524,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 		return $return;
 	}
+
 
 	private function create_text_file_on_publish($id, $action)
 	{
@@ -586,6 +621,82 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
 
 		return $result;
+	}
+
+	private function choose_file($id, $action)
+	{
+
+		if (isset($_FILES['file'])) {
+			$file = $_FILES['file'];
+
+			// Define the upload directory
+			$upload_dir = wp_upload_dir();
+
+			// Generate a unique file name
+			$file_name = sanitize_file_name($file['name']);
+
+			// Move the uploaded file to the server
+			$move_result = move_uploaded_file($file['tmp_name'], $upload_dir['path'] . '/' . $file_name);
+
+			if ($move_result) {
+				echo 'File uploaded successfully to ' . $upload_dir['url'] . '/' . $file_name;
+			} else {
+				echo 'Error uploading file.';
+			}
+			// Redirect back to the page after processing
+			wp_redirect(wp_get_referer());
+			exit;
+		}
+
+		// Get the instance details.
+		/*
+		$instance = $this->get_app_instance_details($id);
+
+		if (is_wp_error($instance)) {
+			/* translators: %s is replaced with the name of the action being executed */
+		//return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
+		//} 
+
+		// Get the domain we're working on.
+		//$domain = $this->get_domain_name($id);
+
+		// Construct a command to update SSL certificates.
+		// This command changes the folder to the WordPress folder (which is the same name as the domain)
+		// and then runs the wp-cli command to update SSL certificates.
+
+
+
+		// Call your function to install the commercial SSL certificate
+		/*$result = $this->execute_ssh('generic', $instance, ['commands' => $command]);
+
+		if ($result) {
+			$success_msg = __('Command was a success - commercial and key SSL installed!', 'wpcd');
+			$result = [
+				'msg' => $success_msg,
+				'refresh' => 'yes',
+			];
+		} else {
+			$result = new \WP_Error(__('Failed to install commercial and key SSL certificate.', 'wpcd'));
+		}
+
+		// Constructing the async command
+		$run_cmd = $this->turn_script_into_command(
+			$instance,
+			'ssl-file.txt',
+			array_merge(
+				$args,
+				[
+					'command' => $command,
+					'action' => $action,
+					'domain' => $domain,
+				]
+			)
+		);
+
+		// Running the async command
+		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
+          
+		return $result; */
 	}
 
 
