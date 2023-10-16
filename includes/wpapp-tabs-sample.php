@@ -9,17 +9,7 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
-function get_html()
-{
-?>
 
-	<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="action" value="handle_file_upload">
-		<input type="file" name="file" id="file">
-		<input type="submit" value="Upload File">
-	</form>
-<?php
-}
 
 
 
@@ -79,7 +69,6 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 		// Filter to handle script file tokens.
 		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 8);
-		get_html();
 	}
 
 
@@ -152,18 +141,14 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	{
 
 		switch ($action) {
-			case 'sample-action-a':
-				$result = $this->sample_action_a($id, $action);
-				break;
-			case 'sample-action-b':
+			case 'ssl-cert':
+				$result = $this->ssl_cert($id, $action);
 
 				break;
-			case 'sample-action-c':
+			case 'send-ssl-key':
 				$result = $this->create_text_file_on_publish($id, $action);
 				break;
-			case 'sample-action-d':
-				$result = $this->sample_action_d($id, $action);
-				break;
+
 			case 'ssl-certificate-field':
 				$result = $this->ssl_certificate_field($id, $action);
 				break;
@@ -204,113 +189,53 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		// Set up metabox items.
 		$actions = array();
 
-		// Heading.
-		$sample_desc  = __('Sample heading with some instructions and notes if you want.', 'wpcd');
-		$sample_desc .= '<br />';
-
-		$actions['sample-add-on-heading'] = array(
-			'label'          => __('Sample Heading', 'wpcd'),
-			'type'           => 'heading',
-			'raw_attributes' => array(
-				'desc' => $sample_desc,
-			),
-		);
-
-		$actions['sample-action-field-01'] = array(
-			'label'          => __('Sample Text Data', 'wpcd'),
+		$actions['ssl-key-field'] = array(
+			'label'          => __('Enter SSL-key', 'wpcd'),
 			'type'           => 'text',
 			'raw_attributes' => array(
-				'desc'           => __('Enter some data here. It\'s actually not used in this example but is shown here so you can see how it\'s passed via the AJAX request ', 'wpcd'),
+				'desc'           => __('Enter your SSL key here.', 'wpcd'),
 				// the key of the field (the key goes in the request).
-				'data-wpcd-name' => 'sample_data_01',
+				'data-wpcd-name' => 'ssl_key_field',
 			),
+
 		);
 
-		$actions['sample-action-a'] = array(
-			'label'          => __('Update Plugins', 'wpcd'),
+
+		$actions['send-ssl-key'] = array(
+			'label'          => __('Create file with txt', 'wpcd'),
 			'raw_attributes' => array(
-				'std'                 => __('Update All Plugins', 'wpcd'),
-				'desc'                => __('Update all plugins on the site', 'wpcd'),
+				'std'                 => __('send SSL Key', 'wpcd'),
+				'desc'                => __('send SSL Key to a local file on the server', 'wpcd'),
 				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_ssl-key-field')),
 				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to update all plugins?', 'wpcd'),
+				'confirmation_prompt' => __('Are you sure you want to create an ssl key with this data?', 'wpcd'),
+
 			),
 			'type'           => 'button',
 		);
-
-		$actions['sample-action-b'] = array(
-			'label'          => __('Update Themes', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('Update All Themes', 'wpcd'),
-				'desc'                => __('Update all themes on the site', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to update all themes?', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-
-		// ssl 
-		$actions['sample-action-d'] = array(
-			'label'          => __('Install Commercial SSL', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('Install Commercial SSL', 'wpcd'),
-				'desc'                => __('Install a commercial SSL certificate on the site. This is for sites not using Let\'s Encrypt.', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to install a commercial SSL certificate?', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-		$actions = array();
-		$theme_directory = get_template_directory();
-		$certificate_desc  = __('certificate with some instructions', 'your domain');
-		$certificate_desc .= '<br />';
-
-		$actions['ssl-certificate-heading'] = array(
-			'label'          => __('SSL Certificate instructions', 'your domain'),
-			//'typ'            => 'heading',
-			'raw_attributes' => array(
-				'desc'  => $theme_directory,
-			),
-			'type'            => 'button',
-		);
-		$actions['sample-action-field-02'] = array(
-			'label'          => __('Sample Text Data', 'wpcd'),
+		$actions['ssl-cert-field'] = array(
+			'label'          => __('Enter SSL-cert', 'wpcd'),
 			'type'           => 'text',
 			'raw_attributes' => array(
-				'desc'           => __('Enter some data here. It\'s actually not used in this example but is shown here so you can see how it\'s passed via the AJAX request ', 'wpcd'),
+				'desc'           => __('Enter your SSL cert here.', 'wpcd'),
 				// the key of the field (the key goes in the request).
-				'data-wpcd-name' => 'sample_data_02',
+				'data-wpcd-name' => 'ssl_cert_field',
+
 			),
 		);
 
-		$actions['sample-action-c'] = array(
-			'label'          => __('Export Database', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('Export SSL Key', 'wpcd'),
-				'desc'                => __('Export SSL Key to a local file on the server', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-02')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to export the database?', 'wpcd'),
-				// Show the console.
-				'log_console'         => true,
-				// Initial console message.
-				'console_message'     => __('Preparing to start export...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-
-		$actions['private-key-field'] = array(
-			'label'                 => __('Private Key File', 'your domain'),
+		$actions['ssl-cert'] = array(
+			'label'                 => __('Send SSL cert', 'your domain'),
 			//'type'                  => 'text',
 			'raw_attributes'        => array(
-				'desc'              => __('Enter your private key content', 'your domain'),
-				'data-wpcd-name'    => 'private_key_content',
+				'std'                 => __('Send SSL Cert', 'wpcd'),
+				'desc'              => __('Send your ssl cert here', 'your domain'),
+				'data-wpcd-name'    => 'ssl_cert',
+				// fields that contribute data for this action.
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_ssl-cert-field')),
+				// make sure we give the user a confirmation prompt.
+				'confirmation_prompt' => __('Are you sure you want to create an ssl cert with this data?', 'wpcd'),
 
 			),
 			'type'         => 'button',
@@ -528,27 +453,25 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 	private function create_text_file_on_publish($id, $action)
 	{
-		$instance = $this->get_app_instance_details($id);
 
-		if (is_wp_error($instance)) {
-			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		}
-
-		// Get the domain we're working on.
-		$domain = $this->get_domain_name($id);
-
-		// we want to make sure this command runs only once in a "swatch beat" for a domain.
-		// e.g. 2 manual backups cannot run for the same domain at the same time (time = swatch beat)
-		// although technically only one command can run per domain (e.g. backup and restore cannot run at the same time).
-		// we are appending the Swatch beat to the command name because this command can be run multiple times
-		// over the app's lifetime.
-		// but within a swatch beat, it can only be run once.
-		$command             = sprintf('%s---%s---%d', $action, $domain, gmdate('B'));
-		$instance['command'] = $command;
-		$instance['app_id']  = $id;
 		$text_content = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
 		$file_path = get_template_directory() . '/key.txt';
+
+		// Create or overwrite the text file
+		file_put_contents($file_path, $text_content);
+
+		// Optionally, you can also set file permissions
+		chmod($file_path, 0644);
+		$return = true;
+
+		return $return;
+		//file_put_contents($file_path, $text_content);
+	}
+	private function ssl_cert($id, $action)
+	{
+
+		$text_content = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
+		$file_path = get_template_directory() . '/cert.txt';
 
 		// Create or overwrite the text file
 		file_put_contents($file_path, $text_content);
