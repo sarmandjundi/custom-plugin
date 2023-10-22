@@ -1,0 +1,14 @@
+
+echo "done" && {
+
+ 
+sudo -E cp /var/www/##DOMAIN##/html/wp-content/uploads/files/ssl_cert.crt /var/www/##DOMAIN##/html/ssl/ssl_cert.crt >> ##SCRIPT_LOGS##.log.intermed 2>&1 &&
+sudo -E cp /var/www/##DOMAIN##/html/wp-content/uploads/files/ssl_key.key /var/www/##DOMAIN##/html/ssl/ssl_key.key &&
+sudo -E chown www-data:www-data /var/www/##DOMAIN##/html/ssl/ssl_cert.crt /var/www/##DOMAIN##/html/ssl/ssl_key.key &&
+sudo -E chmod 600 /var/www/##DOMAIN##/html/ssl/ssl_cert.crt /var/www/##DOMAIN##/html/ssl/ssl_key.key &&
+sudo -E systemctl restart nginx &&
+sudo -E mv ##SCRIPT_LOGS##.log.intermed ##SCRIPT_LOGS##.log.done &&
+
+sudo -E wget -q ##CALLBACK_URL##
+
+} > /dev/null 2>&1 &

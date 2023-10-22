@@ -12,40 +12,11 @@ if (!defined('ABSPATH')) {
 
 
 
-
-
-
-
+/**
+ * Class for adding a new tab to the application details screen.
+ */
 class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 {
-
-	public function handle_file_upload()
-	{
-
-		if (isset($_FILES['file'])) {
-			$file = $_FILES['file'];
-
-			// Define the upload directory
-			$upload_dir = wp_upload_dir();
-
-			// Generate a unique file name
-			$file_name = sanitize_file_name($file['name']);
-
-			// Move the uploaded file to the server
-			$move_result = move_uploaded_file($file['tmp_name'], $upload_dir['path'] . '/' . $file_name);
-
-			if ($move_result) {
-				echo 'File uploaded successfully to ' . $upload_dir['url'] . '/' . $file_name;
-			} else {
-				echo 'Error uploading file.';
-			}
-			// Redirect back to the page after processing
-			wp_redirect(wp_get_referer());
-			exit;
-		}
-	}
-
-
 
 	/**
 	 * WPCD_WORDPRESS_TABS_PHP constructor.
@@ -59,20 +30,14 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		add_filter("wpcd_app_{$this->get_app_name()}_get_tabs", array($this, 'get_tab_fields_sample'), 10, 2);
 		add_filter("wpcd_app_{$this->get_app_name()}_tab_action", array($this, 'tab_action_sample'), 10, 3);
 
-		add_action("wpcd_command_{$this->get_app_name()}_completed", array($this, 'command_completed_sample'), 10, 4);
-
-		add_action('admin_post_handle_file_upload', array($this, 'handle_file_upload'), 10, 5);
-		add_action('admin_post_nopriv_handle_file_upload', array($this, 'handle_file_upload'), 10, 6);
+		add_action("wpcd_command_{$this->get_app_name()}_completed", array($this, 'command_completed_sample'), 10, 2);
 
 		// Filter to make sure we give the correct file path when merging contents.
-		add_filter('wpcd_script_file_name', array($this, 'wpcd_script_file_name'), 10, 7);
+		add_filter('wpcd_script_file_name', array($this, 'wpcd_script_file_name'), 10, 2);
 
 		// Filter to handle script file tokens.
-		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 8);
+		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 7);
 	}
-
-
-
 
 	/**
 	 * Called when a command completes.
@@ -125,7 +90,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	public function get_tab_fields_sample(array $fields, $id)
 	{
 
-		return $this->get_fields_for_tab($fields, $id, 'sample');
+		return $this->get_fields_for_tab($fields, $id, 'sample', array('sample-action-ssl-file'));
 	}
 
 	/**
@@ -141,19 +106,21 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	{
 
 		switch ($action) {
-			case 'ssl-cert':
-				$result = $this->ssl_cert($id, $action);
+			case 'sample-action-a':
+				$result = $this->sample_action_a($id, $action);
+				break;
+			case 'sample-action-b':
+				$result = $this->sample_action_b($id, $action);
+				break;
+			case 'sample-action-c':
+				$result = $this->sample_action_c($id, $action);
+				break;
+			case 'sample-action-d':
+				$result = $this->sample_action_d($id, $action);
+				break;
 
-				break;
-			case 'send-ssl-key':
-				$result = $this->create_text_file_on_publish($id, $action);
-				break;
-
-			case 'ssl-certificate-field':
-				$result = $this->ssl_certificate_field($id, $action);
-				break;
-			case 'choose-file':
-				$result = $this->choose_file($id, $action);
+			case 'sample-action-ssl-file':
+				$result = $this->sample_action_ssl($id, $action);
 				break;
 		}
 
@@ -172,8 +139,6 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		return $this->get_server_fields_sample($id);
 	}
 
-
-
 	/**
 	 * Gets the fields for the services to be shown in the Sample tab in the server details screen.
 	 *
@@ -181,105 +146,123 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	 *
 	 * @return array Array of actions with key as the action slug and value complying with the structure necessary by metabox.io fields.
 	 */
-
 	private function get_server_fields_sample($id)
 	{
-
 
 		// Set up metabox items.
 		$actions = array();
 
-		$actions['ssl-key-field'] = array(
-			'label'          => __('Enter SSL-key', 'wpcd'),
-			'type'           => 'text',
-			'raw_attributes' => array(
-				'desc'           => __('Enter your SSL key here.', 'wpcd'),
-				// the key of the field (the key goes in the request).
-				'data-wpcd-name' => 'ssl_key_field',
-			),
+		// Heading.
+		$sample_desc  = __('exportdb.txt', 'wpcd');
+		$sample_desc .= '<br />';
 
+		$actions['sample-add-on-heading'] = array(
+			'label'          => __('Sample Heading', 'wpcd'),
+			'type'           => 'heading',
+			'raw_attributes' => array(
+				'desc' => $sample_desc,
+			),
 		);
 
-
-		$actions['send-ssl-key'] = array(
-			'label'          => __('Create file with txt', 'wpcd'),
+		$actions['sample-action-field-01'] = array(
+			'label'          => __('Sample Text Data', 'wpcd'),
+			'type'           => 'text',
 			'raw_attributes' => array(
-				'std'                 => __('send SSL Key', 'wpcd'),
-				'desc'                => __('send SSL Key to a local file on the server', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_ssl-key-field')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you want to create an ssl key with this data?', 'wpcd'),
+				'desc'           => __('Enter some data here. It\'s actually not used in this example but is shown here so you can see how it\'s passed via the AJAX request ', 'wpcd'),
+				// the key of the field (the key goes in the request).
+				'data-wpcd-name' => 'sample_data_01',
+			),
+		);
 
+		$actions['sample-action-a'] = array(
+			'label'          => __('Update Plugins', 'wpcd'),
+			'raw_attributes' => array(
+				'std'                 => __('Update All Plugins', 'wpcd'),
+				'desc'                => __('Update all plugins on the site', 'wpcd'),
+				// fields that contribute data for this action.
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
+				// make sure we give the user a confirmation prompt.
+				'confirmation_prompt' => __('Are you sure you would like to update all plugins?', 'wpcd'),
 			),
 			'type'           => 'button',
 		);
-		$actions['ssl-cert-field'] = array(
-			'label'          => __('Enter SSL-cert', 'wpcd'),
-			'type'           => 'text',
+
+		$actions['sample-action-b'] = array(
+			'label'          => __('Update Themes', 'wpcd'),
 			'raw_attributes' => array(
-				'desc'           => __('Enter your SSL cert here.', 'wpcd'),
-				// the key of the field (the key goes in the request).
-				'data-wpcd-name' => 'ssl_cert_field',
-
-			),
-		);
-
-		$actions['ssl-cert'] = array(
-			'label'                 => __('Send SSL cert', 'your domain'),
-			//'type'                  => 'text',
-			'raw_attributes'        => array(
-				'std'                 => __('Send SSL Cert', 'wpcd'),
-				'desc'              => __('Send your ssl cert here', 'your domain'),
-				'data-wpcd-name'    => 'ssl_cert',
+				'std'                 => __('Update All Themes', 'wpcd'),
+				'desc'                => __('Update all themes on the site', 'wpcd'),
 				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_ssl-cert-field')),
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
 				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you want to create an ssl cert with this data?', 'wpcd'),
-
+				'confirmation_prompt' => __('Are you sure you would like to update all themes?', 'wpcd'),
 			),
-			'type'         => 'button',
-
-		);
-		$actions['choose-file'] = array(
-			'label'                 => __('choose File', 'your domain'),
-			//'type'                  => 'text',
-			'raw_attributes'        => array(
-				'desc'              => __('choose your file', 'your domain'),
-				'data-wpcd-name'    => 'choose_file',
-
-			),
-			'type'         => 'file',
-			'name'       => 'file',
-			'id'          => 'file',
-
-
-
-
-
-		);
-		$actions['handle-file-upload'] = array(
-			'label'                 => __('choose File', 'your domain'),
-			//'type'                  => 'text',
-			'raw_attributes'        => array(
-				'desc'              => __('choose your file', 'your domain'),
-				'data-wpcd-name'    => 'handle_file_upload',
-
-			),
-			'type'         => 'submit',
-			'value'       => 'Upload file',
-
-
+			'type'           => 'button',
 		);
 
+		$actions['sample-action-c'] = array(
+			'label'          => __('Export Database', 'wpcd'),
+			'raw_attributes' => array(
+				'std'                 => __('Export database', 'wpcd'),
+				'desc'                => __('export database', 'wpcd'),
+				// fields that contribute data for this action.
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
+				// make sure we give the user a confirmation prompt.
+				'confirmation_prompt' => __('Are you sure you would like to export the database?', 'wpcd'),
+				// Show the console.
+				'log_console'         => true,
+				// Initial console message.
+				'console_message'     => __('Preparing to start export...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
+			),
+			'type'           => 'button',
+		);
+
+		$actions['sample-action-d'] = array(
+			'label'          => __('Compress Domain Files', 'wpcd'),
+			'raw_attributes' => array(
+				'std'                 => __('compress files', 'wpcd'),
+				'desc'                => __('compress files in the WP folder for this domain into a single .gz archive.', 'wpcd'),
+				// fields that contribute data for this action.
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
+				// make sure we give the user a confirmation prompt.
+				'confirmation_prompt' => __('Are you sure you would like to compress files?', 'wpcd'),
+				// Show the console.
+				'log_console'         => true,
+				// Initial console message.
+				'console_message'     => __('Preparing to create compress files archive...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
+			),
+			'type'           => 'button',
+		);
+		$actions['sample-action-ssl-file'] = array(
+			'label'          => __('SSL-CERT', 'wpcd'),
+			'raw_attributes' => array(
+				'desc'           => __('Enter your ssl cert here.', 'wpcd'),
+				'data-wpcd-name' => 'ssl cert',
+			),
+			'type'           => 'file',
+			'name'           => 'file',
+		);
+		$actions['sample-action-ssl'] = array(
+			'label'          => __('Install SSL Certificate', 'wpcd'),
+			'raw_attributes' => array(
+				'std'                 => __('install SSL certificate', 'wpcd'),
+				'desc'                => __('install SSL certificate and key for this domain.', 'wpcd'),
+				// fields that contribute data for this action.
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
+				// make sure we give the user a confirmation prompt.
+				'confirmation_prompt' => __('Are you sure you would like to install SSL certificate?', 'wpcd'),
+				// Show the console.
+				'log_console'         => true,
+				// Initial console message.
+				'console_message'     => __('Preparing to install SSL certificate...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
+			),
+
+			'type'           => 'button',
+
+		);
 
 		return $actions;
 	}
-
-
-
-
-
 
 	/**
 	 * Sample Action "A": updates all plugins on the site.
@@ -435,6 +418,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 				$args,
 				array(
 					'command' => $command,
+					'action'  => $action,
+					'domain'  => $domain,
 				)
 			)
 		);
@@ -450,50 +435,9 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		return $return;
 	}
 
-
-	private function create_text_file_on_publish($id, $action)
-	{
-
-		$text_content = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
-		$file_path = get_template_directory() . '/key.txt';
-
-		// Create or overwrite the text file
-		file_put_contents($file_path, $text_content);
-
-		// Optionally, you can also set file permissions
-		chmod($file_path, 0644);
-		$return = true;
-
-		return $return;
-		//file_put_contents($file_path, $text_content);
-	}
-	private function ssl_cert($id, $action)
-	{
-
-		$text_content = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
-		$file_path = get_template_directory() . '/cert.txt';
-
-		// Create or overwrite the text file
-		file_put_contents($file_path, $text_content);
-
-		// Optionally, you can also set file permissions
-		chmod($file_path, 0644);
-		$return = true;
-
-		return $return;
-		//file_put_contents($file_path, $text_content);
-	}
-
-	/**
-	 * Install Commercial and Key SSL Certificate.
-	 *
-	 * @param int    $id                 The postID of the server cpt.
-	 * @param string $action             The action to be performed (this matches the string required in the bash scripts if bash scripts are used).
-	 *
-	 * @return boolean success/failure/other
-	 */
 	private function sample_action_d($id, $action)
 	{
+
 		// Get the instance details.
 		$instance = $this->get_app_instance_details($id);
 
@@ -502,128 +446,98 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
 		}
 
+		// We're going to collect any arguments sent.
+		// But we're not using them. Only including them here so that you can see how we do basic sanitization.
+		// You can also use the FILTER_INPUT function if you like as well.
+		$args = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
+
 		// Get the domain we're working on.
 		$domain = $this->get_domain_name($id);
 
-		// Construct a command to update SSL certificates.
-		// This command changes the folder to the WordPress folder (which is the same name as the domain)
-		// and then runs the wp-cli command to update SSL certificates.
+		// we want to make sure this command runs only once in a "swatch beat" for a domain.
+		// e.g. 2 manual backups cannot run for the same domain at the same time (time = swatch beat)
+		// although technically only one command can run per domain (e.g. backup and restore cannot run at the same time).
+		// we are appending the Swatch beat to the command name because this command can be run multiple times
+		// over the app's lifetime.
+		// but within a swatch beat, it can only be run once.
+		$command             = sprintf('%s---%s---%d', $action, $domain, gmdate('B'));
+		$instance['command'] = $command;
+		$instance['app_id']  = $id;
 
-		// Replace these paths with actual paths to your commercial SSL certificate and key files.
-		$sslCertificatePath = '/path/to/commercial_certificate.crt';
-		$sslKeyPath = '/path/to/commercial_private_key.key';
-
-		// Call your function to install the commercial SSL certificate
-		$result = $this->execute_ssh('generic', $instance, ['commands' => $command]);
-
-		if ($result) {
-			$success_msg = __('Command was a success - commercial and key SSL installed!', 'wpcd');
-			$result = [
-				'msg' => $success_msg,
-				'refresh' => 'yes',
-			];
-		} else {
-			$result = new \WP_Error(__('Failed to install commercial and key SSL certificate.', 'wpcd'));
-		}
-
-		// Constructing the async command
+		// Construct a run command.
+		// 'exportdb.txt' is the file that contains the commands we'll be sending to the server.
+		// We will be using a filter later to add a pathname to it.
 		$run_cmd = $this->turn_script_into_command(
 			$instance,
-			'ssl-file.txt',
+			'article02.txt',
 			array_merge(
 				$args,
-				[
+				array(
 					'command' => $command,
-					'action' => $action,
-					'domain' => $domain,
-				]
+					'action'  => $action,
+					'domain'  => $domain,
+				)
 			)
 		);
-
-		// Running the async command
 		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
-
-		return $result;
+		return $return;
 	}
 
-	private function choose_file($id, $action)
+	private function sample_action_ssl($id, $action)
 	{
 
-		if (isset($_FILES['file'])) {
-			$file = $_FILES['file'];
+		// Handle file upload
+		$sslCertFile = $_FILES['file']['tmp_name'];
+		$destination = '/var/www/sarmand-do1.bldt.dev/html/uploads/files/ssl_key.key';
+		move_uploaded_file($sslCertFile, $destination);
 
-			// Define the upload directory
-			$upload_dir = wp_upload_dir();
+		/*
 
-			// Generate a unique file name
-			$file_name = sanitize_file_name($file['name']);
-
-			// Move the uploaded file to the server
-			$move_result = move_uploaded_file($file['tmp_name'], $upload_dir['path'] . '/' . $file_name);
-
-			if ($move_result) {
-				echo 'File uploaded successfully to ' . $upload_dir['url'] . '/' . $file_name;
-			} else {
-				echo 'Error uploading file.';
-			}
-			// Redirect back to the page after processing
-			wp_redirect(wp_get_referer());
-			exit;
-		}
 
 		// Get the instance details.
-		/*
 		$instance = $this->get_app_instance_details($id);
 
 		if (is_wp_error($instance)) {
-			/* translators: %s is replaced with the name of the action being executed */
-		//return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		//} 
+			
+			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
+		}  
+
+		// We're going to collect any arguments sent.
+		// But we're not using them. Only including them here so that you can see how we do basic sanitization.
+		// You can also use the FILTER_INPUT function if you like as well.
+		$args = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
 
 		// Get the domain we're working on.
-		//$domain = $this->get_domain_name($id);
+		$domain = $this->get_domain_name($id);
 
-		// Construct a command to update SSL certificates.
-		// This command changes the folder to the WordPress folder (which is the same name as the domain)
-		// and then runs the wp-cli command to update SSL certificates.
+		// we want to make sure this command runs only once in a "swatch beat" for a domain.
+		// e.g. 2 manual backups cannot run for the same domain at the same time (time = swatch beat)
+		// although technically only one command can run per domain (e.g. backup and restore cannot run at the same time).
+		// we are appending the Swatch beat to the command name because this command can be run multiple times
+		// over the app's lifetime.
+		// but within a swatch beat, it can only be run once.
+		$command             = sprintf('%s---%s---%d', $action, $domain, gmdate('B'));
+		$instance['command'] = $command;
+		$instance['app_id']  = $id;
 
-
-
-		// Call your function to install the commercial SSL certificate
-		/*$result = $this->execute_ssh('generic', $instance, ['commands' => $command]);
-
-		if ($result) {
-			$success_msg = __('Command was a success - commercial and key SSL installed!', 'wpcd');
-			$result = [
-				'msg' => $success_msg,
-				'refresh' => 'yes',
-			];
-		} else {
-			$result = new \WP_Error(__('Failed to install commercial and key SSL certificate.', 'wpcd'));
-		}
-
-		// Constructing the async command
+		// Construct a run command.
+		// 'exportdb.txt' is the file that contains the commands we'll be sending to the server.
+		// We will be using a filter later to add a pathname to it.
 		$run_cmd = $this->turn_script_into_command(
 			$instance,
-			'ssl-file.txt',
+			'ssl.txt',
 			array_merge(
 				$args,
-				[
+				array(
 					'command' => $command,
-					'action' => $action,
-					'domain' => $domain,
-				]
+					'action'  => $action,
+					'domain'  => $domain,
+				)
 			)
 		);
-
-		// Running the async command
 		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
-          
-		return $result; */
+		return $return; */
 	}
-
-
-
 	/**
 	 * Make sure that we return the full path name of the script file if the script filename is one of ours.
 	 *
@@ -641,7 +555,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	{
 
 		// shortcut and return if not something we should handle.
-		if ('exportdb.txt' !== $script_name && 'ssl-file.txt' !== $script_name) {
+		if ('exportdb.txt' !== $script_name && 'article02.txt' !== $script_name) {
 			return $script_name;
 		}
 
@@ -681,7 +595,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 				$additional
 			);
 		}
-		if ('ssl-file.txt' === $script_name) {
+		if ('article02.txt' === $script_name) {
 			$command_name = $additional['command'];
 			$new_array    = array_merge(
 				array(
@@ -692,60 +606,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			);
 		}
 
+
 		return $new_array;
-	}
-
-	public function ssl_certificate_field($id, $action)
-	{
-		$instance = $this->get_app_instance_details($id);
-
-		if (is_wp_error($instance)) {
-			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		}
-
-		// Get the domain we're working on.
-		$domain = $this->get_domain_name($id);
-
-		// Construct a command to update SSL certificates.
-		// This command changes the folder to the WordPress folder (which is the same name as the domain)
-		// and then runs the wp-cli command to update SSL certificates.
-
-		// Replace these paths with actual paths to your commercial SSL certificate and key files.
-		$sslCertificatePath = '/path/to/commercial_certificate.crt';
-		$sslKeyPath = '/path/to/commercial_private_key.key';
-
-		// Call your function to install the commercial SSL certificate
-		$result = $this->execute_ssh('generic', $instance, ['commands' => $command]);
-
-		if ($result) {
-			$success_msg = __('Command was a success - commercial and key SSL installed!', 'wpcd');
-			$result = [
-				'msg' => $success_msg,
-				'refresh' => 'yes',
-			];
-		} else {
-			$result = new \WP_Error(__('Failed to install commercial and key SSL certificate.', 'wpcd'));
-		}
-
-		// Constructing the async command
-		$run_cmd = $this->turn_script_into_command(
-			$instance,
-			'ssl-file.txt',
-			array_merge(
-				$args,
-				[
-					'command' => $command,
-					'action' => $action,
-					'domain' => $domain,
-				]
-			)
-		);
-
-		// Running the async command
-		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
-
-		return $result;
 	}
 }
 
