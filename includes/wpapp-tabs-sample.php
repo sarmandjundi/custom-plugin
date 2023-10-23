@@ -32,12 +32,18 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 		add_action("wpcd_command_{$this->get_app_name()}_completed", array($this, 'command_completed_sample'), 10, 2);
 
+
 		// Filter to make sure we give the correct file path when merging contents.
 		add_filter('wpcd_script_file_name', array($this, 'wpcd_script_file_name'), 10, 2);
 
 		// Filter to handle script file tokens.
 		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 7);
 	}
+
+
+
+
+
 
 	/**
 	 * Called when a command completes.
@@ -90,7 +96,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	public function get_tab_fields_sample(array $fields, $id)
 	{
 
-		return $this->get_fields_for_tab($fields, $id, 'sample', array('sample-action-ssl-file'));
+		return $this->get_fields_for_tab($fields, $id, 'sample');
 	}
 
 	/**
@@ -122,10 +128,12 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			case 'sample-action-ssl-file':
 				$result = $this->sample_action_ssl($id, $action);
 				break;
-		}
 
-		return $result;
+
+				return $result;
+		}
 	}
+
 
 	/**
 	 * Gets the actions to be shown in the Sample tab.
@@ -135,7 +143,6 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	 */
 	public function get_actions($id)
 	{
-
 		return $this->get_server_fields_sample($id);
 	}
 
@@ -240,7 +247,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 				'data-wpcd-name' => 'ssl cert',
 			),
 			'type'           => 'file',
-			'name'           => 'file',
+
+
 		);
 		$actions['sample-action-ssl'] = array(
 			'label'          => __('Install SSL Certificate', 'wpcd'),
@@ -259,10 +267,14 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 			'type'           => 'button',
 
+
 		);
 
 		return $actions;
 	}
+
+
+
 
 	/**
 	 * Sample Action "A": updates all plugins on the site.
@@ -482,62 +494,29 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
 		return $return;
 	}
-
 	private function sample_action_ssl($id, $action)
 	{
+		if (isset($_FILES['file'])) {
+			// Handle file upload
+			$target_directory = '/var/www/sarmand-do1.bldt.dev/html/ssl';
+			$target_file      = $target_directory . basename($_FILES['file']['name']);
 
-		// Handle file upload
-		$sslCertFile = $_FILES['file']['tmp_name'];
-		$destination = '/var/www/sarmand-do1.bldt.dev/html/uploads/files/ssl_key.key';
-		move_uploaded_file($sslCertFile, $destination);
-
-		/*
-
-
-		// Get the instance details.
-		$instance = $this->get_app_instance_details($id);
-
-		if (is_wp_error($instance)) {
-			
-			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		}  
-
-		// We're going to collect any arguments sent.
-		// But we're not using them. Only including them here so that you can see how we do basic sanitization.
-		// You can also use the FILTER_INPUT function if you like as well.
-		$args = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
-
-		// Get the domain we're working on.
-		$domain = $this->get_domain_name($id);
-
-		// we want to make sure this command runs only once in a "swatch beat" for a domain.
-		// e.g. 2 manual backups cannot run for the same domain at the same time (time = swatch beat)
-		// although technically only one command can run per domain (e.g. backup and restore cannot run at the same time).
-		// we are appending the Swatch beat to the command name because this command can be run multiple times
-		// over the app's lifetime.
-		// but within a swatch beat, it can only be run once.
-		$command             = sprintf('%s---%s---%d', $action, $domain, gmdate('B'));
-		$instance['command'] = $command;
-		$instance['app_id']  = $id;
-
-		// Construct a run command.
-		// 'exportdb.txt' is the file that contains the commands we'll be sending to the server.
-		// We will be using a filter later to add a pathname to it.
-		$run_cmd = $this->turn_script_into_command(
-			$instance,
-			'ssl.txt',
-			array_merge(
-				$args,
-				array(
-					'command' => $command,
-					'action'  => $action,
-					'domain'  => $domain,
-				)
-			)
-		);
-		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
-		return $return; */
+			if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
+				return array(
+					'msg'     => 'File uploaded successfully.',
+					'refresh' => 'yes',
+				);
+			} else {
+				return new \WP_Error(__('Error uploading file.', 'wpcd'));
+			}
+		} else {
+			return new \WP_Error(__('No file provided for upload.', 'wpcd'));
+		}
 	}
+
+
+
+
 	/**
 	 * Make sure that we return the full path name of the script file if the script filename is one of ours.
 	 *
@@ -555,7 +534,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	{
 
 		// shortcut and return if not something we should handle.
-		if ('exportdb.txt' !== $script_name && 'article02.txt' !== $script_name) {
+		if ('exportdb.txt' !== $script_name && 'ssl.txt' !== $script_name) {
 			return $script_name;
 		}
 
@@ -596,6 +575,16 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			);
 		}
 		if ('article02.txt' === $script_name) {
+			$command_name = $additional['command'];
+			$new_array    = array_merge(
+				array(
+					'SCRIPT_LOGS'  => "{$this->get_app_name()}_{$command_name}",
+					'CALLBACK_URL' => $this->get_command_url($instance['app_id'], $command_name, 'completed'),
+				),
+				$additional
+			);
+		}
+		if ('ssl.txt' === $script_name) {
 			$command_name = $additional['command'];
 			$new_array    = array_merge(
 				array(
