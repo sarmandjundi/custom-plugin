@@ -136,8 +136,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 				$result = $this->sample_action_d($id, $action);
 				break;  */
 
-			case 'send-text':
-				$result = $this->send_text($id, $action);
+			case 'install-ssl-certificate':
+				$result = $this->install_ssl_certificate($id, $action);
 				break;
 
 
