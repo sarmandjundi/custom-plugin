@@ -204,18 +204,18 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 		); */
 
-		// handling text
+
 		$actions['handle-ssl-certificate'] = array(
 			'label'             => __('Add SSL certificate data: ', 'your_domain'),
 			'raw_attributes'    => array(
-				'desc'            => __('paste SSL certificate data', 'your_domain'),
+				'desc'            => __('paste your SSL certificate data here', 'your_domain'),
 				'data-wpcd-name'  => 'install_ssl_certificate',
 			),
 			'type'              => 'textarea',
 			'name'              => 'textData',
 		);
 
-		// sending text
+
 		$actions['install-ssl-certificate'] = array(
 			'label'          => __('Install SSL Certificate', 'your_domain'),
 			'raw_attributes' => array(
