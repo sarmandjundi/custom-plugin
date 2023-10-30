@@ -12,11 +12,13 @@ if (!defined('ABSPATH')) {
 
 
 
+
 /**
  * Class for adding a new tab to the application details screen.
  */
 class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 {
+
 
 	/**
 	 * WPCD_WORDPRESS_TABS_PHP constructor.
@@ -38,11 +40,20 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 		// Filter to handle script file tokens.
 		add_filter('wpcd_wpapp_replace_script_tokens', array($this, 'wpcd_wpapp_replace_script_tokens'), 10, 7);
+		//$this->get_html();
 	}
 
-
-
-
+	/*public function get_html()
+	{
+?>
+		<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+			<input type="hidden" name="action" value="handle_text">
+			<label for="textData">Text here:</label>
+			<textarea name="textData" id="textData"></textarea>
+			<input type="submit" value="Skicka Text">
+		</form>
+<?php
+	} */
 
 
 	/**
@@ -112,7 +123,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	{
 
 		switch ($action) {
-			case 'sample-action-a':
+				/*case 'sample-action-a':
 				$result = $this->sample_action_a($id, $action);
 				break;
 			case 'sample-action-b':
@@ -123,10 +134,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 				break;
 			case 'sample-action-d':
 				$result = $this->sample_action_d($id, $action);
-				break;
+				break;  */
 
-			case 'sample-action-ssl-file':
-				$result = $this->sample_action_ssl($id, $action);
+			case 'send-text':
+				$result = $this->send_text($id, $action);
 				break;
 
 
@@ -160,87 +171,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		$actions = array();
 
 		// Heading.
-		$sample_desc  = __('exportdb.txt', 'wpcd');
+		$sample_desc  = __('transfer-file.txt', 'wpcd');
 		$sample_desc .= '<br />';
 
-		$actions['sample-add-on-heading'] = array(
-			'label'          => __('Sample Heading', 'wpcd'),
-			'type'           => 'heading',
-			'raw_attributes' => array(
-				'desc' => $sample_desc,
-			),
-		);
-
-		$actions['sample-action-field-01'] = array(
-			'label'          => __('Sample Text Data', 'wpcd'),
-			'type'           => 'text',
-			'raw_attributes' => array(
-				'desc'           => __('Enter some data here. It\'s actually not used in this example but is shown here so you can see how it\'s passed via the AJAX request ', 'wpcd'),
-				// the key of the field (the key goes in the request).
-				'data-wpcd-name' => 'sample_data_01',
-			),
-		);
-
-		$actions['sample-action-a'] = array(
-			'label'          => __('Update Plugins', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('Update All Plugins', 'wpcd'),
-				'desc'                => __('Update all plugins on the site', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to update all plugins?', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-
-		$actions['sample-action-b'] = array(
-			'label'          => __('Update Themes', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('Update All Themes', 'wpcd'),
-				'desc'                => __('Update all themes on the site', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to update all themes?', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-
-		$actions['sample-action-c'] = array(
-			'label'          => __('Export Database', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('Export database', 'wpcd'),
-				'desc'                => __('export database', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to export the database?', 'wpcd'),
-				// Show the console.
-				'log_console'         => true,
-				// Initial console message.
-				'console_message'     => __('Preparing to start export...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-
-		$actions['sample-action-d'] = array(
-			'label'          => __('Compress Domain Files', 'wpcd'),
-			'raw_attributes' => array(
-				'std'                 => __('compress files', 'wpcd'),
-				'desc'                => __('compress files in the WP folder for this domain into a single .gz archive.', 'wpcd'),
-				// fields that contribute data for this action.
-				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_sample-action-field-01')),
-				// make sure we give the user a confirmation prompt.
-				'confirmation_prompt' => __('Are you sure you would like to compress files?', 'wpcd'),
-				// Show the console.
-				'log_console'         => true,
-				// Initial console message.
-				'console_message'     => __('Preparing to create compress files archive...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
-			),
-			'type'           => 'button',
-		);
-		$actions['sample-action-ssl-file'] = array(
+		/*$actions['sample-action-ssl-file'] = array(
 			'label'          => __('SSL-CERT', 'wpcd'),
 			'raw_attributes' => array(
 				'desc'           => __('Enter your ssl cert here.', 'wpcd'),
@@ -268,23 +202,43 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			'type'           => 'button',
 
 
+		); */
+
+		// handling text
+		$actions['handle-ssl-certificate'] = array(
+			'label'             => __('Add SSL certificate data: ', 'your_domain'),
+			'raw_attributes'    => array(
+				'desc'            => __('paste SSL certificate data', 'your_domain'),
+				'data-wpcd-name'  => 'install_ssl_certificate',
+			),
+			'type'              => 'textarea',
+			'name'              => 'textData',
 		);
+
+		// sending text
+		$actions['install-ssl-certificate'] = array(
+			'label'          => __('Install SSL Certificate', 'your_domain'),
+			'raw_attributes' => array(
+				'desc'       => __('Trigger the action to install SSL Certificate', 'your_domain'),
+				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_handle-ssl-certificate')),
+				'confirmation_prompt' => __('Are you sure you would like to install SSL certificate?', 'wpcd'),
+				'data-wpcd-name' => 'send_button',
+				'log_console'         => true,
+				// Initial console message.
+				'console_message'     => __('Preparing to install SSL certificate...<br /> Please DO NOT EXIT this screen until you see a popup message indicating that the operation has completed or has errored.<br />This terminal should refresh every 60-90 seconds with updated progress information from the server. <br /> After the operation is complete the entire log can be viewed in the COMMAND LOG screen.', 'wpcd'),
+			),
+
+			'type'           => 'button',
+			'name'           => 'sendButton',
+		);
+
 
 		return $actions;
 	}
 
 
 
-
-	/**
-	 * Sample Action "A": updates all plugins on the site.
-	 *
-	 * @param int    $id         The postID of the server cpt.
-	 * @param string $action     The action to be performed (this matches the string required in the bash scripts if bash scripts are used).
-	 *
-	 * @return boolean success/failure/other
-	 */
-	private function sample_action_a($id, $action)
+	private function install_ssl_certificate($id, $action)
 	{
 
 		// Get the instance details.
@@ -295,112 +249,6 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
 		}
 
-		// Get the domain we're working on.
-		$domain = $this->get_domain_name($id);
-
-		// Construct a simple command.
-		// This command is three bash commands chanined by "&&".
-		// First it changes the folder to the WordPress folder (which is the same name as the domain).
-		// Then it lists the folder name (this is unnecessary but included here just to show how bash chaining works if you're not familiar with it.
-		// Finally it runs the wp-cli plugin update command.
-		// The full command will look like this: 'cd /var/www/my.domain.com/html && pwd && sudo -u my.domain.com wp plugin update --all'.
-		$command = "cd /var/www/$domain/html && pwd && sudo -u $domain wp plugin update --all";
-
-		// Send the command and wait for a reply.
-		// This command needs to complete within the limits of the PHP Execution timeout.
-		$result = $this->execute_ssh('generic', $instance, array('commands' => $command));
-
-		// Check output string to make sure we don't have an error...
-		if (!(strpos($result, 'Success: Updated')) && !(strpos($result, 'Success: Plugin already updated.'))) {
-			return new \WP_Error(__('An error was encounered during the updates. Please check the SSH logs for more information.', 'wpcd'));
-		}
-
-		// If you got here, success!
-		// @todo: you can do cool things by parsing the result string to check for number of plugins updated and reporting that back to the user.
-		$success_msg = __('Command was a success - plugins updated!', 'wpcd');
-		$result      = array(
-			'msg'     => $success_msg,
-			'refresh' => 'yes',
-		);
-
-		return $result;
-	}
-
-	/**
-	 * Sample Action "B": updates all themes on the site.
-	 *
-	 * This one is the same process as "A" with a different command.
-	 *
-	 * @param int    $id         The postID of the server cpt.
-	 * @param string $action     The action to be performed (this matches the string required in the bash scripts if bash scripts are used).
-	 *
-	 * @return boolean success/failure/other
-	 */
-	private function sample_action_b($id, $action)
-	{
-
-		// Get the instance details.
-		$instance = $this->get_app_instance_details($id);
-
-		if (is_wp_error($instance)) {
-			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		}
-
-		// Get the domain we're working on.
-		$domain = $this->get_domain_name($id);
-
-		// Construct a simple command.
-		// This command is three bash commands chanined by "&&".
-		// First it changes the folder to the WordPress folder (which is the same name as the domain).
-		// Then it lists the folder name (this is unnecessary but included here just to show how bash chaining works if you're not familiar with it.
-		// Finally it runs the wp-cli plugin update command.
-		// The full command will look like this: 'cd /var/www/my.domain.com/html && pwd && sudo -u my.domain.com wp plugin update --all'.
-		$command = "cd /var/www/$domain/html && pwd && sudo -u $domain wp theme update --all";
-
-		// Send the command and wait for a reply.
-		// This command needs to complete within the limits of the PHP Execution timeout.
-		$result = $this->execute_ssh('generic', $instance, array('commands' => $command));
-
-		// Check output string to make sure we don't have an error...
-		if (!(strpos($result, 'Success: Updated')) && !(strpos($result, 'Success: Theme already updated.'))) {
-			return new \WP_Error(__('An error was encounered during the updates. Please check the SSH logs for more information.', 'wpcd'));
-		}
-
-		// If you got here, success!
-		// @todo: you can do cool things by parsing the result string to check for number of plugins updated and reporting that back to the user.
-		$success_msg = __('Command was a success - themes updated!', 'wpcd');
-		$result      = array(
-			'msg'     => $success_msg,
-			'refresh' => 'yes',
-		);
-
-		return $result;
-	}
-
-	/**
-	 * Sample Action "C": Export the database.
-	 *
-	 * This action is going to be handled with a console shown on the screen.  Which is different from the "A" and "B" actions.
-	 * This is an example of a long running action.
-	 * Note: You cannot use long-running actions in this style on the server tabs! If you want to connect a long-running action
-	 * for a server level command that is not tied to a WP site, you should still initiate it from a WP site.
-	 *
-	 * @param int    $id         The postID of the server cpt.
-	 * @param string $action     The action to be performed (this matches the string required in the bash scripts if bash scripts are used).
-	 *
-	 * @return boolean success/failure/other
-	 */
-	private function sample_action_c($id, $action)
-	{
-
-		// Get the instance details.
-		$instance = $this->get_app_instance_details($id);
-
-		if (is_wp_error($instance)) {
-			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		}
 
 		// We're going to collect any arguments sent.
 		// But we're not using them. Only including them here so that you can see how we do basic sanitization.
@@ -425,63 +273,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		// We will be using a filter later to add a pathname to it.
 		$run_cmd = $this->turn_script_into_command(
 			$instance,
-			'exportdb.txt',
-			array_merge(
-				$args,
-				array(
-					'command' => $command,
-					'action'  => $action,
-					'domain'  => $domain,
-				)
-			)
-		);
-
-
-		/**
-		 * Run the constructed commmand .
-		 * Check out the write up about the different aysnc methods we use
-		 * here: https://wpclouddeploy.com/documentation/wpcloud-deploy-dev-notes/ssh-execution-models/
-		 */
-		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
-
-		return $return;
-	}
-
-	private function sample_action_d($id, $action)
-	{
-
-		// Get the instance details.
-		$instance = $this->get_app_instance_details($id);
-
-		if (is_wp_error($instance)) {
-			/* translators: %s is replaced with the name of the action being executed */
-			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
-		}
-
-		// We're going to collect any arguments sent.
-		// But we're not using them. Only including them here so that you can see how we do basic sanitization.
-		// You can also use the FILTER_INPUT function if you like as well.
-		$args = wp_parse_args(sanitize_text_field(wp_unslash($_POST['params'])));
-
-		// Get the domain we're working on.
-		$domain = $this->get_domain_name($id);
-
-		// we want to make sure this command runs only once in a "swatch beat" for a domain.
-		// e.g. 2 manual backups cannot run for the same domain at the same time (time = swatch beat)
-		// although technically only one command can run per domain (e.g. backup and restore cannot run at the same time).
-		// we are appending the Swatch beat to the command name because this command can be run multiple times
-		// over the app's lifetime.
-		// but within a swatch beat, it can only be run once.
-		$command             = sprintf('%s---%s---%d', $action, $domain, gmdate('B'));
-		$instance['command'] = $command;
-		$instance['app_id']  = $id;
-
-		// Construct a run command.
-		// 'exportdb.txt' is the file that contains the commands we'll be sending to the server.
-		// We will be using a filter later to add a pathname to it.
-		$run_cmd = $this->turn_script_into_command(
-			$instance,
-			'article02.txt',
+			'transfer-file.txt',
 			array_merge(
 				$args,
 				array(
@@ -494,25 +286,20 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 		$return = $this->run_async_command_type_2($id, $command, $run_cmd, $instance, $action);
 		return $return;
 	}
-	private function sample_action_ssl($id, $action)
-	{
-		if (isset($_FILES['file'])) {
-			// Handle file upload
-			$target_directory = '/var/www/sarmand-do1.bldt.dev/html/ssl';
-			$target_file      = $target_directory . basename($_FILES['file']['name']);
 
-			if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-				return array(
-					'msg'     => 'File uploaded successfully.',
-					'refresh' => 'yes',
-				);
+
+
+	/*private function handle_text($id, $action)
+	{
+		if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'handle_text') {
+			if (isset($_POST['textData'])) {
+				$textData = sanitize_text_field(wp_unslash($_POST['textData']));
+				echo 'Text have been send: ' . $textData;
 			} else {
-				return new \WP_Error(__('Error uploading file.', 'wpcd'));
+				echo 'No text sended.';
 			}
-		} else {
-			return new \WP_Error(__('No file provided for upload.', 'wpcd'));
 		}
-	}
+	} */
 
 
 
@@ -534,7 +321,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	{
 
 		// shortcut and return if not something we should handle.
-		if ('exportdb.txt' !== $script_name && 'ssl.txt' !== $script_name) {
+		if ('transfer-file.txt' !== $script_name) {
 			return $script_name;
 		}
 
@@ -564,27 +351,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 	public function wpcd_wpapp_replace_script_tokens($new_array, $array, $script_name, $script_version, $instance, $command, $additional)
 	{
 
-		if ('exportdb.txt' === $script_name) {
-			$command_name = $additional['command'];
-			$new_array    = array_merge(
-				array(
-					'SCRIPT_LOGS'  => "{$this->get_app_name()}_{$command_name}",
-					'CALLBACK_URL' => $this->get_command_url($instance['app_id'], $command_name, 'completed'),
-				),
-				$additional
-			);
-		}
-		if ('article02.txt' === $script_name) {
-			$command_name = $additional['command'];
-			$new_array    = array_merge(
-				array(
-					'SCRIPT_LOGS'  => "{$this->get_app_name()}_{$command_name}",
-					'CALLBACK_URL' => $this->get_command_url($instance['app_id'], $command_name, 'completed'),
-				),
-				$additional
-			);
-		}
-		if ('ssl.txt' === $script_name) {
+
+		if ('transfer-file.txt' === $script_name) {
 			$command_name = $additional['command'];
 			$new_array    = array_merge(
 				array(

@@ -1,0 +1,7 @@
+echo "done" &&{
+
+  cd ~ &&
+  sudo -E mkdir '/var/www/##DOMAIN##/ssl' &&
+  sudo sh -c 'echo "##SEND_TEXT## > /var/www/##DOMAIN##/ssl/##DOMAIN##.crt' &&
+
+} > /dev/null 2>&1 &
