@@ -215,10 +215,10 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			'name'              => 'textData',
 		);
 
-
 		$actions['install-ssl-certificate'] = array(
 			'label'          => __('Install SSL Certificate', 'your_domain'),
 			'raw_attributes' => array(
+				'std'                 => __('Export SSL Cert', 'wpcd'),
 				'desc'       => __('Trigger the action to install SSL Certificate', 'your_domain'),
 				'data-wpcd-fields'    => wp_json_encode(array('#wpcd_app_action_handle-ssl-certificate')),
 				'confirmation_prompt' => __('Are you sure you would like to install SSL certificate?', 'wpcd'),
@@ -230,6 +230,8 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 			'type'           => 'button',
 			'name'           => 'sendButton',
+
+
 		);
 
 
@@ -240,6 +242,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 
 	private function install_ssl_certificate($id, $action)
 	{
+		error_log("Debug: Before running install_ssl_certificate command");
 
 		// Get the instance details.
 		$instance = $this->get_app_instance_details($id);
@@ -248,6 +251,7 @@ class WPCD_WordPress_TABS_APP_SAMPLE extends WPCD_WORDPRESS_TABS
 			/* translators: %s is replaced with the name of the action being executed */
 			return new \WP_Error(sprintf(__('Unable to execute this request because we cannot get the instance details for action %s', 'wpcd'), $action));
 		}
+
 
 
 		// We're going to collect any arguments sent.
